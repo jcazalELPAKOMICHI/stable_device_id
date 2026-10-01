@@ -1,6 +1,6 @@
 name: stable_device_id
-description: "A device identifier that survives app updates and reinstalls: ANDROID_ID on Android and a Keychain-backed UUID on iOS."
-version: 0.1.0
+description: "A device identifier that survives app updates and reinstalls: ANDROID_ID or Widevine on Android and a Keychain-backed UUID on iOS."
+version: 0.2.0
 repository: https://github.com/jcazalELPAKOMICHI/stable_device_id
 issue_tracker: https://github.com/jcazalELPAKOMICHI/stable_device_id/issues
 topics:

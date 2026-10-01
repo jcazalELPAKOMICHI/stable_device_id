@@ -14,26 +14,32 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _deviceId = 'Loading…';
+  String _defaultId = 'Loading…';
+  String _widevineId = 'Loading…';
 
   @override
   void initState() {
     super.initState();
-    _loadDeviceId();
+    _loadIds();
   }
 
-  Future<void> _loadDeviceId() async {
-    String deviceId;
+  Future<String> _read(AndroidIdSource source) async {
     try {
-      deviceId = await StableDeviceId.getId();
+      return await StableDeviceId.getId(androidSource: source);
     } on PlatformException catch (e) {
-      deviceId = 'Failed to get device id: ${e.code}';
+      return 'Unavailable (${e.code})';
     }
+  }
+
+  Future<void> _loadIds() async {
+    final defaultId = await _read(AndroidIdSource.androidId);
+    final widevineId = await _read(AndroidIdSource.widevine);
 
     if (!mounted) return;
 
     setState(() {
-      _deviceId = deviceId;
+      _defaultId = defaultId;
+      _widevineId = widevineId;
     });
   }
 
@@ -42,13 +48,17 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('stable_device_id example')),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: SelectableText(
-              'Device id: $_deviceId',
-              textAlign: TextAlign.center,
-            ),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Default (ANDROID_ID / Keychain)'),
+              SelectableText('Device id: $_defaultId'),
+              const SizedBox(height: 24),
+              const Text('Android: Widevine'),
+              SelectableText('Widevine id: $_widevineId'),
+            ],
           ),
         ),
       ),

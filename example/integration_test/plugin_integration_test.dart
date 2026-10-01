@@ -2,6 +2,9 @@
 // native side of the plugin. Run with:
 // flutter test integration_test/plugin_integration_test.dart
 
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -23,5 +26,29 @@ void main() {
     final second = await StableDeviceId.getId(initialValue: 'ignored');
 
     expect(second, first);
+  });
+
+  testWidgets('widevine returns a stable hashed identifier or a typed error', (
+    WidgetTester tester,
+  ) async {
+    try {
+      final first = await StableDeviceId.getId(
+        androidSource: AndroidIdSource.widevine,
+      );
+      final second = await StableDeviceId.getId(
+        androidSource: AndroidIdSource.widevine,
+      );
+
+      expect(second, first);
+      if (Platform.isAndroid) {
+        expect(first, matches(RegExp(r'^[0-9a-f]{64}$')));
+        expect(first, isNot(await StableDeviceId.getId()));
+      } else {
+        expect(first, await StableDeviceId.getId());
+      }
+    } on PlatformException catch (e) {
+      expect(Platform.isAndroid, isTrue);
+      expect(e.code, 'WIDEVINE_UNAVAILABLE');
+    }
   });
 }

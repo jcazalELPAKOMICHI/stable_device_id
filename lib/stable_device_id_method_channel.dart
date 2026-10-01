@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'src/android_id_source.dart';
 import 'stable_device_id_platform_interface.dart';
 
 /// An implementation of [StableDeviceIdPlatform] that uses method channels.
 class MethodChannelStableDeviceId extends StableDeviceIdPlatform {
   static const String _getIdMethod = 'getId';
+  static const String _androidSourceArgument = 'androidSource';
   static const String _initialValueArgument = 'initialValue';
   static const String _unavailableErrorCode = 'UNAVAILABLE';
 
@@ -14,8 +16,12 @@ class MethodChannelStableDeviceId extends StableDeviceIdPlatform {
   final methodChannel = const MethodChannel('stable_device_id');
 
   @override
-  Future<String> getId({String? initialValue}) async {
+  Future<String> getId({
+    AndroidIdSource androidSource = AndroidIdSource.androidId,
+    String? initialValue,
+  }) async {
     final id = await methodChannel.invokeMethod<String>(_getIdMethod, {
+      _androidSourceArgument: androidSource.name,
       _initialValueArgument: initialValue,
     });
     if (id == null || id.isEmpty) {

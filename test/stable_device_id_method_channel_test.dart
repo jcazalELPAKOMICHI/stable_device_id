@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stable_device_id/stable_device_id.dart';
 import 'package:stable_device_id/stable_device_id_method_channel.dart';
 
 void main() {
@@ -28,15 +29,24 @@ void main() {
 
     expect(await platform.getId(), 'device-id');
     expect(lastCall?.method, 'getId');
-    expect(lastCall?.arguments, {'initialValue': null});
+    expect(lastCall?.arguments, {
+      'androidSource': 'androidId',
+      'initialValue': null,
+    });
   });
 
-  test('getId forwards initialValue', () async {
+  test('getId forwards the Android source and initialValue', () async {
     mockResponse('legacy');
 
-    await platform.getId(initialValue: 'legacy');
+    await platform.getId(
+      androidSource: AndroidIdSource.widevine,
+      initialValue: 'legacy',
+    );
 
-    expect(lastCall?.arguments, {'initialValue': 'legacy'});
+    expect(lastCall?.arguments, {
+      'androidSource': 'widevine',
+      'initialValue': 'legacy',
+    });
   });
 
   test('getId throws when the platform returns null', () async {

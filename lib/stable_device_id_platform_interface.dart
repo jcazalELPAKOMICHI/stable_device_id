@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'src/android_id_source.dart';
 import 'stable_device_id_method_channel.dart';
 
 /// The interface that implementations of stable_device_id must implement.
@@ -25,7 +26,10 @@ abstract class StableDeviceIdPlatform extends PlatformInterface {
   }
 
   /// Returns the stable identifier of this device.
-  Future<String> getId({String? initialValue}) {
+  Future<String> getId({
+    AndroidIdSource androidSource = AndroidIdSource.androidId,
+    String? initialValue,
+  }) {
     throw UnimplementedError('getId() has not been implemented.');
   }
 }

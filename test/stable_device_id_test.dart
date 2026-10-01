@@ -7,10 +7,15 @@ import 'package:stable_device_id/stable_device_id_platform_interface.dart';
 class MockStableDeviceIdPlatform
     with MockPlatformInterfaceMixin
     implements StableDeviceIdPlatform {
+  AndroidIdSource? receivedAndroidSource;
   String? receivedInitialValue;
 
   @override
-  Future<String> getId({String? initialValue}) {
+  Future<String> getId({
+    AndroidIdSource androidSource = AndroidIdSource.androidId,
+    String? initialValue,
+  }) {
+    receivedAndroidSource = androidSource;
     receivedInitialValue = initialValue;
     return Future.value('device-id');
   }
@@ -23,11 +28,21 @@ void main() {
     expect(initialPlatform, isInstanceOf<MethodChannelStableDeviceId>());
   });
 
-  test('getId delegates to the platform', () async {
+  test('getId uses ANDROID_ID by default', () async {
     final fakePlatform = MockStableDeviceIdPlatform();
     StableDeviceIdPlatform.instance = fakePlatform;
 
     expect(await StableDeviceId.getId(initialValue: 'legacy'), 'device-id');
+    expect(fakePlatform.receivedAndroidSource, AndroidIdSource.androidId);
     expect(fakePlatform.receivedInitialValue, 'legacy');
+  });
+
+  test('getId forwards the Android source', () async {
+    final fakePlatform = MockStableDeviceIdPlatform();
+    StableDeviceIdPlatform.instance = fakePlatform;
+
+    await StableDeviceId.getId(androidSource: AndroidIdSource.widevine);
+
+    expect(fakePlatform.receivedAndroidSource, AndroidIdSource.widevine);
   });
 }

@@ -35,4 +35,26 @@ internal class StableDeviceIdPluginTest {
 
         Mockito.verify(mockResult).error(eq("UNAVAILABLE"), anyString(), isNull())
     }
+
+    @Test
+    fun onMethodCall_getWidevineIdWithoutContext_returnsUnavailableError() {
+        val plugin = StableDeviceIdPlugin()
+
+        val call = MethodCall("getId", mapOf("androidSource" to "widevine"))
+        val mockResult: MethodChannel.Result = Mockito.mock(MethodChannel.Result::class.java)
+        plugin.onMethodCall(call, mockResult)
+
+        Mockito.verify(mockResult).error(eq("UNAVAILABLE"), anyString(), isNull())
+    }
+
+    @Test
+    fun onMethodCall_unknownAndroidSource_returnsInvalidArgumentError() {
+        val plugin = StableDeviceIdPlugin()
+
+        val call = MethodCall("getId", mapOf("androidSource" to "imei"))
+        val mockResult: MethodChannel.Result = Mockito.mock(MethodChannel.Result::class.java)
+        plugin.onMethodCall(call, mockResult)
+
+        Mockito.verify(mockResult).error(eq("INVALID_ARGUMENT"), anyString(), isNull())
+    }
 }
