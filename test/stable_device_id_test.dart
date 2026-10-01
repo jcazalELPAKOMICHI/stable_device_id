@@ -22,7 +22,8 @@ class MockStableDeviceIdPlatform
 }
 
 void main() {
-  final StableDeviceIdPlatform initialPlatform = StableDeviceIdPlatform.instance;
+  final StableDeviceIdPlatform initialPlatform =
+      StableDeviceIdPlatform.instance;
 
   test('$MethodChannelStableDeviceId is the default instance', () {
     expect(initialPlatform, isInstanceOf<MethodChannelStableDeviceId>());

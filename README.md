@@ -236,6 +236,16 @@ cd example/android
 ./gradlew :stable_device_id:testDebugUnitTest
 ```
 
+### Releasing
+
+Releases are published to pub.dev automatically by GitHub Actions:
+
+1. Bump `version` in `pubspec.yaml` and `s.version` in `ios/stable_device_id.podspec`.
+2. Add a `## <version>` entry to `CHANGELOG.md`.
+3. Merge to `main`. CI runs the checks and, if the version has no tag yet, creates `v<version>`; that tag publishes the release.
+
+Pushes to `main` that do not change the version run the checks only.
+
 ## License
 
 MIT © Jose Cazal. See [LICENSE](LICENSE).

@@ -1,0 +1,96 @@
+# Runs on every pull request and every push to main.
+# On main, when the version in pubspec.yaml has no tag yet, it creates the
+# tag v<version>. That tag push triggers publish.yml, which publishes to pub.dev.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Read Flutter version from .fvmrc
+        id: fvm
+        run: echo "version=$(jq -r '.flutter' .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          (cd example && flutter pub get)
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test example/lib example/test example/integration_test
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Unit tests
+        run: flutter test
+
+      - name: Example tests
+        working-directory: example
+        run: flutter test
+
+      - name: Check versions are consistent
+        run: |
+          version=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
+          podspec=$(grep -E "s.version\s*=" ios/stable_device_id.podspec | sed -E "s/.*'(.*)'.*/\1/")
+          if [ "$version" != "$podspec" ]; then
+            echo "::error::pubspec.yaml ($version) and stable_device_id.podspec ($podspec) versions differ"
+            exit 1
+          fi
+          if ! grep -qE "^## $version\$" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## $version' entry"
+            exit 1
+          fi
+
+      - name: Validate package
+        run: flutter pub publish --dry-run
+
+  tag:
+    name: Tag new version
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          # A tag pushed with the default GITHUB_TOKEN does not trigger other
+          # workflows, so a personal access token is required here.
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Create tag if the version is new
+        run: |
+          version=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
+          tag="v$version"
+          if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+            echo "Tag $tag already exists. Bump the version in pubspec.yaml to publish a new release."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$tag" -m "Release $version"
+          git push origin "$tag"
+          echo "Created $tag; publish.yml will publish it to pub.dev."

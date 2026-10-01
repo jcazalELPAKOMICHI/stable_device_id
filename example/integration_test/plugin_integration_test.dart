@@ -13,7 +13,9 @@ import 'package:stable_device_id/stable_device_id.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('getId returns a non-empty identifier', (WidgetTester tester) async {
+  testWidgets('getId returns a non-empty identifier', (
+    WidgetTester tester,
+  ) async {
     final id = await StableDeviceId.getId();
 
     expect(id, isNotEmpty);
