@@ -1,0 +1,34 @@
+name: stable_device_id
+description: "A device identifier that survives app updates and reinstalls: ANDROID_ID on Android and a Keychain-backed UUID on iOS."
+version: 0.1.0
+# TODO: set before publishing, e.g. https://github.com/<user>/stable_device_id
+# repository:
+# issue_tracker:
+topics:
+  - device-id
+  - device-identifier
+  - keychain
+  - android-id
+
+environment:
+  sdk: ^3.8.0
+  flutter: '>=3.32.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: py.com.jcazal.stable_device_id
+        pluginClass: StableDeviceIdPlugin
+      ios:
+        pluginClass: StableDeviceIdPlugin
