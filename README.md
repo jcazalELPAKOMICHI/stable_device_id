@@ -165,7 +165,16 @@ A complete example app is available in the [`example`](example) folder.
 
 ## Contributing
 
-Issues and pull requests are welcome. To run the tests:
+Issues and pull requests are welcome on [GitHub](https://github.com/jcazalELPAKOMICHI/stable_device_id).
+
+The project pins its Flutter version with [FVM](https://fvm.app) in `.fvmrc` (currently Flutter 3.47.5 / Dart 3.13). Using the same version avoids differences in analysis and generated native files:
+
+```bash
+fvm install   # installs the version from .fvmrc
+fvm flutter pub get
+```
+
+Prefix the commands below with `fvm` (`fvm flutter test`, …) when using FVM. To run the tests:
 
 ```bash
 # Dart unit tests

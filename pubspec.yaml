@@ -1,9 +1,8 @@
 name: stable_device_id
 description: "A device identifier that survives app updates and reinstalls: ANDROID_ID on Android and a Keychain-backed UUID on iOS."
 version: 0.1.0
-# TODO: set before publishing, e.g. https://github.com/<user>/stable_device_id
-# repository:
-# issue_tracker:
+repository: https://github.com/jcazalELPAKOMICHI/stable_device_id
+issue_tracker: https://github.com/jcazalELPAKOMICHI/stable_device_id/issues
 topics:
   - device-id
   - device-identifier
@@ -12,7 +11,7 @@ topics:
 
 environment:
   sdk: ^3.8.0
-  flutter: '>=3.32.0'
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
