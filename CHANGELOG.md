@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Se arregla problema de plugins kotlin
+
 ## 0.2.0
 
 * Add `AndroidIdSource.widevine`: the Widevine DRM device ID, hashed with the package name. On most physical devices it also survives a factory reset.
